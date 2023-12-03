@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  postgres:
+    image: "postgres:16-alpine"
+    restart: always
+    container_name: dsm-postgres
+    environment:
+      POSTGRES_PASSWORD: test
+      POSTGRES_USER: test
+      POSTGRES_DB: dsm
+    volumes:
+      - ./script/postgres/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+
+#  app:
+#    build: .
+#    container_name: dsm-app
+#    environment:
+#      - DB_SERVER=postgres
+#    ports:
+#      - 8080:8080
