@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
 	"github.com/Jadepypy/distributed-social-media/application/internal/usecase"
 	"github.com/gin-gonic/gin"
@@ -22,8 +21,6 @@ func NewUserHandler(useCase usecase.UserUseCase) *UserHandler {
 }
 
 func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
-	fmt.Println("receive!!!2")
-
 	userGroup := server.Group("/user")
 	userGroup.POST("/signup", u.SignUp)
 	userGroup.POST("/login", u.Login)
