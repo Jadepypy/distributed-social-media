@@ -2,14 +2,15 @@ package dao
 
 import (
 	"context"
-	"database/sql"
 	"gorm.io/gorm"
+	"time"
 )
 
 type User struct {
-	Id       int64          `gorm:"primaryKey,autoIncrement"`
-	Email    sql.NullString `gorm:"unique"`
-	Password string
+	Id       int64  `gorm:"primaryKey,autoIncrement"`
+	Email    string `gorm:"unique,not null"`
+	Password string `gorm:"not null"`
+	Birthday string `gorm:"default:null"`
 	Nickname string
 	Intro    string
 
@@ -36,13 +37,20 @@ type userDao struct {
 }
 
 func (u *userDao) GetByEmail(ctx context.Context, email string) (User, error) {
-	//TODO implement me
-	panic("implement me")
+	var user User
+	if err := u.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return User{}, err
+	}
+	return user, nil
 }
 
 func (u *userDao) Insert(ctx context.Context, user User) error {
-	//TODO implement me
-	panic("implement me")
+	now := time.Now().UnixMilli()
+	user.CreatedAt = now
+	user.UpdatedAt = now
+
+	// TODO: customize email unique constraint error
+	return u.db.Create(&user).Error
 }
 
 func (u *userDao) Update(ctx context.Context, user User) error {
