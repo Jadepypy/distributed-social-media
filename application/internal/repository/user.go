@@ -39,16 +39,35 @@ func (u *userRepository) GetUserByEmail(ctx context.Context, email string) (doma
 }
 
 func (u *userRepository) UpdateUser(ctx context.Context, user domain.User) error {
-	//TODO implement me
-	panic("implement me")
+	return u.dao.Update(ctx, user.Email, domainToDao(user))
 }
 
+func domainToDao(user domain.User) dao.User {
+	u := dao.User{}
+	if user.Birthday != "" {
+		u.Birthday = &user.Birthday
+	}
+	if user.Nickname != "" {
+		u.Nickname = &user.Nickname
+	}
+	if user.Intro != "" {
+		u.Intro = &user.Intro
+	}
+	return u
+}
 func daoToDomain(user dao.User) domain.User {
-	return domain.User{
+	u := domain.User{
 		Email:    user.Email,
 		Password: user.Password,
-		Birthday: user.Birthday,
-		Nickname: user.Nickname,
-		Intro:    user.Intro,
 	}
+	if user.Birthday != nil {
+		u.Birthday = *user.Birthday
+	}
+	if user.Nickname == nil {
+		u.Nickname = *user.Nickname
+	}
+	if user.Intro == nil {
+		u.Intro = *user.Intro
+	}
+	return u
 }

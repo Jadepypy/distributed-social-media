@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
 	"github.com/Jadepypy/distributed-social-media/application/internal/usecase"
 	"github.com/gin-contrib/sessions"
@@ -43,8 +42,6 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	}
 
 	// TODO: validate request
-
-	fmt.Println("req", req.Email, req.Password)
 	if strings.Compare(req.Password, req.ConfirmPassword) != 0 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "password does not match",
@@ -100,6 +97,33 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
+	type EditReq struct {
+		Birthday string `json:"birthday"`
+		Intro    string `json:"intro"`
+		Nickname string `json:"nickname"`
+	}
+
+	var req EditReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+
+	err := u.useCase.Edit(ctx, domain.User{
+		Birthday: req.Birthday,
+		Intro:    req.Intro,
+		Nickname: req.Nickname,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {

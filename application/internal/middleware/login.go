@@ -21,6 +21,7 @@ func (m *LogInMiddlewareBuilder) CheckLogIn() gin.HandlerFunc {
 			c.JSON(401, gin.H{"message": "Not logged in"})
 			c.Abort()
 		} else {
+			c.Set("user_id", userID)
 			c.Next()
 		}
 	}

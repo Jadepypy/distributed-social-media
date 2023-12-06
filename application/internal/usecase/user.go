@@ -62,8 +62,9 @@ func (u *userUseCase) LogIn(ctx context.Context, user domain.User) error {
 }
 
 func (u *userUseCase) Edit(ctx context.Context, user domain.User) error {
-	//TODO implement me
-	panic("implement me")
+	email := ctx.Value("user_id").(string)
+	user.Email = email
+	return u.repo.UpdateUser(ctx, user)
 }
 
 func (u *userUseCase) GetProfile(ctx context.Context, user domain.User) (domain.User, error) {
