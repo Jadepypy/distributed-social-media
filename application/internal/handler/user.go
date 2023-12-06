@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
 	"github.com/Jadepypy/distributed-social-media/application/internal/usecase"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -88,6 +89,10 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		})
 		return
 	}
+
+	sess := sessions.Default(ctx)
+	sess.Set("user_id", req.Email)
+	sess.Save()
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "success",
