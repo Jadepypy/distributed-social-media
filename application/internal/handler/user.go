@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
 	"github.com/Jadepypy/distributed-social-media/application/internal/usecase"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -22,8 +22,6 @@ func NewUserHandler(useCase usecase.UserUseCase) *UserHandler {
 }
 
 func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
-	fmt.Println("receive!!!2")
-
 	userGroup := server.Group("/user")
 	userGroup.POST("/signup", u.SignUp)
 	userGroup.POST("/login", u.Login)
@@ -44,7 +42,6 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	}
 
 	// TODO: validate request
-
 	if strings.Compare(req.Password, req.ConfirmPassword) != 0 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "password does not match",
@@ -69,9 +66,64 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
+	type LogInReq struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	var req LogInReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+
+	err := u.useCase.LogIn(ctx, domain.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	sess := sessions.Default(ctx)
+	sess.Set("user_id", req.Email)
+	sess.Save()
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
+	type EditReq struct {
+		Birthday string `json:"birthday"`
+		Intro    string `json:"intro"`
+		Nickname string `json:"nickname"`
+	}
+
+	var req EditReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+
+	err := u.useCase.Edit(ctx, domain.User{
+		Birthday: req.Birthday,
+		Intro:    req.Intro,
+		Nickname: req.Nickname,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "success",
+	})
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
