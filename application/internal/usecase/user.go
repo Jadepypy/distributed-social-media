@@ -11,7 +11,7 @@ type UserUseCase interface {
 	SignUp(ctx context.Context, user domain.User) error
 	LogIn(ctx context.Context, user domain.User) error
 	Edit(ctx context.Context, user domain.User) error
-	GetProfile(ctx context.Context, user domain.User) (domain.User, error)
+	GetProfile(ctx context.Context, email string) (domain.User, error)
 }
 
 type userUseCase struct {
@@ -62,12 +62,9 @@ func (u *userUseCase) LogIn(ctx context.Context, user domain.User) error {
 }
 
 func (u *userUseCase) Edit(ctx context.Context, user domain.User) error {
-	email := ctx.Value("user_id").(string)
-	user.Email = email
 	return u.repo.UpdateUser(ctx, user)
 }
 
-func (u *userUseCase) GetProfile(ctx context.Context, user domain.User) (domain.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u *userUseCase) GetProfile(ctx context.Context, email string) (domain.User, error) {
+	return u.repo.GetUserByEmail(ctx, email)
 }

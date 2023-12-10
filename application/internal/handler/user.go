@@ -26,7 +26,7 @@ func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
 	userGroup.POST("/signup", u.SignUp)
 	userGroup.POST("/login", u.Login)
 	userGroup.POST("/edit", u.Edit)
-	userGroup.POST("/profile", u.Profile)
+	userGroup.GET("/profile", u.Profile)
 }
 
 func (u *UserHandler) SignUp(ctx *gin.Context) {
@@ -108,7 +108,9 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 		return
 	}
 
+	email := ctx.Value("user_id").(string)
 	err := u.useCase.Edit(ctx, domain.User{
+		Email:    email,
 		Birthday: req.Birthday,
 		Intro:    req.Intro,
 		Nickname: req.Nickname,
@@ -127,4 +129,18 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
+	email := ctx.Value("user_id").(string)
+	user, err := u.useCase.GetProfile(ctx, email)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"birthday": user.Birthday,
+		"intro":    user.Intro,
+		"nickname": user.Nickname,
+	})
 }
