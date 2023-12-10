@@ -63,10 +63,10 @@ func daoToDomain(user dao.User) domain.User {
 	if user.Birthday != nil {
 		u.Birthday = *user.Birthday
 	}
-	if user.Nickname == nil {
+	if user.Nickname != nil {
 		u.Nickname = *user.Nickname
 	}
-	if user.Intro == nil {
+	if user.Intro != nil {
 		u.Intro = *user.Intro
 	}
 	return u
