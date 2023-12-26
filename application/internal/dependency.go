@@ -3,13 +3,13 @@ package internal
 import (
 	"github.com/Jadepypy/distributed-social-media/application/internal/handler"
 	"github.com/Jadepypy/distributed-social-media/application/internal/repository"
-	"github.com/Jadepypy/distributed-social-media/application/internal/usecase"
+	"github.com/Jadepypy/distributed-social-media/application/internal/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func NewUserHandler() *handler.UserHandler {
-	return handler.NewUserHandler(usecase.NewUserUseCase(repository.NewUserRepository(NewDB())))
+	return handler.NewUserHandler(service.NewUserUseCase(repository.NewUserRepository(NewDB())))
 }
 
 func NewDB() *gorm.DB {

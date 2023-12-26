@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
-	"github.com/Jadepypy/distributed-social-media/application/internal/usecase"
+	"github.com/Jadepypy/distributed-social-media/application/internal/service"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -12,10 +12,10 @@ import (
 var _ handler = (*UserHandler)(nil)
 
 type UserHandler struct {
-	useCase usecase.UserUseCase
+	useCase service.UserUseCase
 }
 
-func NewUserHandler(useCase usecase.UserUseCase) *UserHandler {
+func NewUserHandler(useCase service.UserUseCase) *UserHandler {
 	return &UserHandler{
 		useCase: useCase,
 	}

@@ -7,6 +7,6 @@ CREATE TABLE users (
                        nickname VARCHAR(100),
                        birthday DATE,
                        intro TEXT,
-                       created_at INT,
-                       updated_at INT
+                       created_at BIGINT,
+                       updated_at BIGINT
 );
