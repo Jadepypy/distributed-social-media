@@ -2,9 +2,15 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
 	"github.com/Jadepypy/distributed-social-media/application/internal/repository"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrUserNotFound    = errors.New("user not found")
+	ErrorWrongPassword = errors.New("wrong password")
 )
 
 type UserService interface {
@@ -51,11 +57,11 @@ func (u *userService) SignUp(ctx context.Context, user domain.User) error {
 func (u *userService) LogIn(ctx context.Context, user domain.User) error {
 	existingUser, err := u.repo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
-		return err
+		return ErrUserNotFound
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(user.Password)); err != nil {
-		return err
+	if err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(user.Password)); err != nil {
+		return ErrorWrongPassword
 	}
 
 	return nil

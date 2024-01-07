@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/Jadepypy/distributed-social-media/application/internal/domain"
+	"github.com/Jadepypy/distributed-social-media/application/internal/middleware"
 	"github.com/Jadepypy/distributed-social-media/application/internal/service"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -43,9 +44,11 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 
 	// TODO: validate request
 	if strings.Compare(req.Password, req.ConfirmPassword) != 0 {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "password does not match",
-		})
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "password does not match"}})
 		return
 	}
 
@@ -53,10 +56,23 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 	})
-	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err.Error(),
-		})
+	if err == service.ErrUserNotFound {
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Authentication failed",
+					Reason:  err.Error(),
+				}})
+		return
+	} else if err != nil {
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Internal server error",
+					Reason:  err.Error(),
+				}})
 		return
 	}
 
@@ -80,10 +96,22 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 	})
-	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err.Error(),
-		})
+	if err == service.ErrUserNotFound || err == service.ErrorWrongPassword {
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Authentication failed",
+					Reason:  err.Error(),
+				}})
+	} else if err != nil {
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Internal server error",
+					Reason:  err.Error(),
+				}})
 		return
 	}
 
@@ -105,6 +133,13 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 
 	var req EditReq
 	if err := ctx.Bind(&req); err != nil {
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Internal server error",
+					Reason:  err.Error(),
+				}})
 		return
 	}
 
@@ -117,9 +152,13 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err.Error(),
-		})
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Internal server error",
+					Reason:  err.Error(),
+				}})
 		return
 	}
 
@@ -132,9 +171,13 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 	email := ctx.Value("user_id").(string)
 	user, err := u.useCase.GetProfile(ctx, email)
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": err.Error(),
-		})
+		ctx.Error(
+			&middleware.PrivateError{
+				Code: http.StatusUnauthorized,
+				GeneralResponse: middleware.GeneralResponse{
+					Message: "Internal server error",
+					Reason:  err.Error(),
+				}})
 		return
 	}
 
