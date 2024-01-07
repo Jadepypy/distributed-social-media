@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import (
 	"context"
@@ -7,19 +7,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserUseCase interface {
+type UserService interface {
 	SignUp(ctx context.Context, user domain.User) error
 	LogIn(ctx context.Context, user domain.User) error
 	Edit(ctx context.Context, user domain.User) error
-	GetProfile(ctx context.Context, user domain.User) (domain.User, error)
+	GetProfile(ctx context.Context, email string) (domain.User, error)
 }
 
-type userUseCase struct {
+type userService struct {
 	repo repository.UserRepository
 }
 
-func NewUserUseCase(repo repository.UserRepository) UserUseCase {
-	return &userUseCase{
+func NewUserUseCase(repo repository.UserRepository) UserService {
+	return &userService{
 		repo: repo,
 	}
 }
@@ -33,7 +33,7 @@ func hashPassword(password string) ([]byte, error) {
 	return hash, nil
 }
 
-func (u *userUseCase) SignUp(ctx context.Context, user domain.User) error {
+func (u *userService) SignUp(ctx context.Context, user domain.User) error {
 	hashedPassword, err := hashPassword(user.Password)
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (u *userUseCase) SignUp(ctx context.Context, user domain.User) error {
 	return nil
 }
 
-func (u *userUseCase) LogIn(ctx context.Context, user domain.User) error {
+func (u *userService) LogIn(ctx context.Context, user domain.User) error {
 	existingUser, err := u.repo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
 		return err
@@ -61,13 +61,10 @@ func (u *userUseCase) LogIn(ctx context.Context, user domain.User) error {
 	return nil
 }
 
-func (u *userUseCase) Edit(ctx context.Context, user domain.User) error {
-	email := ctx.Value("user_id").(string)
-	user.Email = email
+func (u *userService) Edit(ctx context.Context, user domain.User) error {
 	return u.repo.UpdateUser(ctx, user)
 }
 
-func (u *userUseCase) GetProfile(ctx context.Context, user domain.User) (domain.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u *userService) GetProfile(ctx context.Context, email string) (domain.User, error) {
+	return u.repo.GetUserByEmail(ctx, email)
 }
