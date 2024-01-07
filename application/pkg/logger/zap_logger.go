@@ -21,7 +21,7 @@ func (z zapLogger) Warn(msg string, args ...Field) {
 }
 
 func (z zapLogger) Error(msg string, args ...Field) {
-	z.l.Warn(msg, toZapFields(args...)...)
+	z.l.Error(msg, toZapFields(args...)...)
 
 }
 
