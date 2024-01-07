@@ -12,10 +12,10 @@ import (
 var _ handler = (*UserHandler)(nil)
 
 type UserHandler struct {
-	useCase service.UserUseCase
+	useCase service.UserService
 }
 
-func NewUserHandler(useCase service.UserUseCase) *UserHandler {
+func NewUserHandler(useCase service.UserService) *UserHandler {
 	return &UserHandler{
 		useCase: useCase,
 	}

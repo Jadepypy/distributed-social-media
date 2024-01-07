@@ -23,3 +23,8 @@
 - [ ] Use wire for dependency injection
 - [ ] Test third party integration
 - [ ] Implement Circuit Breaker for third party integration
+
+## Today
+- [ ] Integrate Redis
+- [ ] Use lua script to handle concurreny issue
+- [ ] Implement set and verify otp login
